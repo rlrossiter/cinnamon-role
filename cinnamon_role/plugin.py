@@ -16,10 +16,10 @@
 
 import os
 
-from tempest import config
+# from tempest import config
 from tempest.test_discover import plugins
 
-from cinnamon_role import config as project_config
+# from cinnamon_role import config as project_config
 
 
 class CinnamonRolePlugin(plugins.TempestPlugin):
