@@ -16,10 +16,42 @@
 
 import os
 
-# from tempest import config
+from oslo_config import cfg
+from tempest import config
 from tempest.test_discover import plugins
 
-# from cinnamon_role import config as project_config
+
+CinnamonGroup = [
+    cfg.StrOpt('role_sets_file',
+               help="""Path to the yaml file that contains the list of role
+sets to test policies on. The file follows the following structure:
+    admin:
+      - admin_role_1
+      - admin_role_2
+    regular_user:
+      - regular_user_role
+
+The list under the role set is the list of roles that are assumed to be on a
+user of that type. If pre-provisioned credentials are used, it is assumed that
+users with these exact roles exist. If dynamic credentials are used,
+users will be generated with these roles placed on them."""),
+
+    cfg.StrOpt('expected_results_file',
+               help="""Path to the yaml file that contains the list of tests,
+and their expected results. The file follows the following structure:
+    cinnamon_role.tests.scenario.TestGivenScenario.test_given_scenario_1:
+      pass:
+        - admin
+      fail:
+        - regular_user
+
+If any tests are not listed, it is assumed that all users will pass it. If a
+user is not listed under the test, it is assumed that that user will
+pass."""),
+]
+
+
+cinnamon_group = cfg.OptGroup(name='cinnamon', title='Cinnamon Role Options')
 
 
 class CinnamonRolePlugin(plugins.TempestPlugin):
@@ -31,7 +63,8 @@ class CinnamonRolePlugin(plugins.TempestPlugin):
         return full_test_dir, base_path
 
     def register_opts(self, conf):
-        pass
+        for g, o in self.get_opt_lists():
+            config.register_opt_group(conf, g, o)
 
     def get_opt_lists(self):
-        pass
+        return [(cinnamon_group, CinnamonGroup)]
