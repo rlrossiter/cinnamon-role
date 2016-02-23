@@ -25,11 +25,26 @@ class for_each_role_set(object):
 
     def _generate_class(self, name, supers, role_set):
         new_name = '%s_%s' % (name, role_set.name)
+        new_cls = type(new_name, supers, dict(supers[0].__dict__))
         creds = [role_set.name]
         creds.extend(role_set.roles)
-        new_cls = type(new_name, supers, {'credentials': [creds]})
+        new_cls.credentials = [creds]
+        new_cls.setup_credentials = setup_credentials
         return new_name, new_cls
 
 
 def get_role_sets():
     return RSP.get_role_sets()
+
+
+@classmethod
+def setup_credentials(cls):
+    my_base = cls.__bases__[0]
+    original_creds = my_base.credentials
+    my_base.credentials = cls.credentials
+    cls.__bases__[0].setup_credentials()
+
+    attr = 'os_roles_%s' % cls.credentials[0][0]
+    cls.os = cls.manager = getattr(cls, attr)
+
+    my_base.credentials = original_creds
