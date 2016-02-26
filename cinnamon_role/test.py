@@ -3,6 +3,7 @@ import sys
 from tempest import config
 
 from cinnamon_role import role_set
+from cinnamon_role import utils
 
 CONF = config.CONF
 RSP = role_set.RoleSetProvider(CONF.cinnamon.role_sets_file)
@@ -16,20 +17,27 @@ class for_each_role_set(object):
         name = cls.__name__
         role_sets = get_role_sets()
 
-        for role_set in role_sets[1:]:
+        for role_set in role_sets:
             new_name, new_cls = self._generate_class(name, (cls, ), role_set)
             setattr(sys.modules[self.mod], new_name, new_cls)
 
-        _, cls = self._generate_class(name, tuple(cls.mro()), role_sets[0])
         return cls
 
     def _generate_class(self, name, supers, role_set):
         new_name = '%s_%s' % (name, role_set.name)
-        new_cls = type(new_name, supers, dict(supers[0].__dict__))
+        new_cls = type(new_name, supers, {})
         creds = [role_set.name]
         creds.extend(role_set.roles)
         new_cls.credentials = [creds]
         new_cls.setup_credentials = setup_credentials
+
+        # wrap test functions for expected passes or failures
+        for f in utils.find_tests(new_cls):
+            full_name = '%s.%s.%s' % (self.mod, name, f)
+            func = getattr(new_cls, f)
+            setattr(new_cls, f,
+                    utils.wrap_for_role_set(func, full_name, role_set))
+
         return new_name, new_cls
 
 
