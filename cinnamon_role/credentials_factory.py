@@ -38,9 +38,9 @@ def with_role_matching_credentials(cls):
         if roles:
             if not cls.are_roles_available(roles):
                 skip_msg = (
-                        "%s skipped because the configured credential provider"
-                        " is not able to provide credentials with the roles "
-                        "%s assigned" % (cls.__name__, roles))
+                    "%s skipped because the configured credential provider"
+                    " is not able to provide credentials with the roles "
+                    "%s assigned" % (cls.__name__, roles))
                 raise cls.skipException(skip_msg)
         return super(cls, cls).get_client_manager(
             credential_type=credential_type, roles=roles, force_new=force_new)

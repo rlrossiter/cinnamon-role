@@ -17,17 +17,17 @@ class for_each_role_set(object):
         name = cls.__name__
         role_sets = get_role_sets()
 
-        for role_set in role_sets:
-            new_name, new_cls = self._generate_class(name, (cls, ), role_set)
+        for rs in role_sets:
+            new_name, new_cls = self._generate_class(name, (cls, ), rs)
             setattr(sys.modules[self.mod], new_name, new_cls)
 
         return cls
 
-    def _generate_class(self, name, supers, role_set):
-        new_name = '%s_%s' % (name, role_set.name)
+    def _generate_class(self, name, supers, rs):
+        new_name = '%s_%s' % (name, rs.name)
         new_cls = type(new_name, supers, {})
-        creds = [role_set.name]
-        creds.extend(role_set.roles)
+        creds = [rs.name]
+        creds.extend(rs.roles)
         new_cls.credentials = [creds]
         new_cls.setup_credentials = setup_credentials
 
@@ -36,7 +36,7 @@ class for_each_role_set(object):
             full_name = '%s.%s.%s' % (self.mod, name, f)
             func = getattr(new_cls, f)
             setattr(new_cls, f,
-                    utils.wrap_for_role_set(func, full_name, role_set))
+                    utils.wrap_for_role_set(func, full_name, rs))
 
         return new_name, new_cls
 

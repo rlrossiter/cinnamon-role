@@ -1,8 +1,8 @@
 import functools
 import inspect
 
-from tempest_lib import exceptions as lib_exc
 from tempest import config
+from tempest_lib import exceptions as lib_exc
 
 from cinnamon_role import expected_results
 
@@ -24,11 +24,12 @@ def wrap_unauthorized(f):
 
 
 def find_tests(cls):
-    all_functions = inspect.getmembers(cls,
-        predicate=lambda x: inspect.ismethod(x) or inspect.isfunction(x))
+    all_functions = inspect.getmembers(
+        cls, predicate=lambda x: inspect.ismethod(x) or inspect.isfunction(x))
     function_names = [f[0] for f in all_functions]
     test_functions = [f for f in function_names if f.startswith('test_')]
     return test_functions
+
 
 def wrap_for_role_set(f, full_name, role_set):
     results_file = CONF.cinnamon.expected_results_file

@@ -38,6 +38,7 @@ class ExpectedResultsProvider(object):
         set_result = test_results.get(role_set) or ExpectedResult(True)
         return set_result
 
+
 class ExpectedResult(object):
     def __init__(self, is_success):
         self.is_success = is_success
