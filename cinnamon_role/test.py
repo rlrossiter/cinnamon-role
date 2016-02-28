@@ -5,6 +5,11 @@ from tempest import config
 from cinnamon_role import role_set
 from cinnamon_role import utils
 
+if sys.version_info >= (2, 7):
+    import unittest
+else:
+    import unittest2 as unittest
+
 CONF = config.CONF
 RSP = role_set.RoleSetProvider(CONF.cinnamon.role_sets_file)
 
@@ -16,10 +21,23 @@ class for_each_role_set(object):
     def __call__(self, cls):
         name = cls.__name__
         role_sets = get_role_sets()
+        test_cases = []
 
         for rs in role_sets:
             new_name, new_cls = self._generate_class(name, (cls, ), rs)
             setattr(sys.modules[self.mod], new_name, new_cls)
+            test_cases.append(new_cls)
+
+        def load_tests(loader, standard_tests, pattern):
+            suite = unittest.TestSuite()
+            for test_class in test_cases:
+                tests = loader.loadTestsFromTestCase(test_class)
+                suite.addTests(tests)
+
+            return suite
+
+        setattr(sys.modules[self.mod], 'load_tests',
+                load_tests)
 
         return cls
 
