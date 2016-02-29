@@ -2,6 +2,7 @@ import sys
 
 from tempest import config
 
+from cinnamon_role import credentials_factory
 from cinnamon_role import role_set
 from cinnamon_role import utils
 
@@ -44,6 +45,7 @@ class for_each_role_set(object):
     def _generate_class(self, name, supers, rs):
         new_name = '%s_%s' % (name, rs.name)
         new_cls = type(new_name, supers, {})
+        new_cls = credentials_factory.with_role_matching_credentials(new_cls)
         creds = [rs.name]
         creds.extend(rs.roles)
         new_cls.credentials = [creds]
@@ -65,12 +67,6 @@ def get_role_sets():
 
 @classmethod
 def setup_credentials(cls):
-    my_base = cls.__bases__[0]
-    original_creds = my_base.credentials
-    my_base.credentials = cls.credentials
-    cls.__bases__[0].setup_credentials()
-
+    super(cls, cls).setup_credentials()
     attr = 'os_roles_%s' % cls.credentials[0][0]
     cls.os = cls.manager = getattr(cls, attr)
-
-    my_base.credentials = original_creds

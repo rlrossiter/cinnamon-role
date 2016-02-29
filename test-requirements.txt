@@ -1,2 +1,4 @@
 hacking<0.11,>=0.10.0
 mock>=1.2
+testtools
+-e git+git://github.com/openstack/tempest.git#egg=tempest
