@@ -1,6 +1,5 @@
 from tempest.api.compute.servers import test_server_actions
 
-from cinnamon_role import credentials_factory
 from cinnamon_role import test
 
 
@@ -8,4 +7,5 @@ from cinnamon_role import test
 class ServerActionsTestJSON(test_server_actions.ServerActionsTestJSON):
     @classmethod
     def get_tenant_network(cls, credentials_type='primary'):
-        return super(ServerActionsTestJSON, cls).get_tenant_network(credentials_type=cls.credentials[0][0])
+        return super(ServerActionsTestJSON, cls).get_tenant_network(
+            credentials_type=cls.credentials[0][0])
