@@ -4,6 +4,7 @@ from tempest import exceptions
 
 
 def read_expected_results_yaml(path):
+    # reads the file with the expected testing results
     try:
         with open(path, 'r') as yaml_file:
             expected_results = yaml.safe_load(yaml_file)
@@ -15,6 +16,7 @@ def read_expected_results_yaml(path):
 
 
 class ExpectedResultsProvider(object):
+    """Holds the information for expected test results."""
     def __init__(self, expected_results_file):
         super(ExpectedResultsProvider, self).__init__()
         expected_results = read_expected_results_yaml(expected_results_file)
@@ -29,6 +31,7 @@ class ExpectedResultsProvider(object):
                 self.expected_results[name][role_set] = ExpectedResult(False)
 
     def get_result(self, name, role_set):
+        # Gets the result for the given test for the given role set
         # if no test defined, assume pass
         test_results = self.expected_results.get(name)
         if not test_results:
@@ -40,6 +43,7 @@ class ExpectedResultsProvider(object):
 
 
 class ExpectedResult(object):
+    """An object to hold the result of a test."""
     def __init__(self, is_success):
         self.is_success = is_success
 

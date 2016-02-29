@@ -4,6 +4,13 @@ from tempest_lib import exceptions as lib_exc
 
 class ExactRoleMatchingPreProvisionedCredentialProvider(
     preprov_creds.PreProvisionedCredentialProvider):
+    """Credentials provider that exactly matches roles on users.
+
+    It uses most of the existing preprov creds provider, but adds more
+    restrictiveness. The existing provider checks to see if the desired
+    roles are a subset of any user. This provider changes that to be an
+    exact match of roles on the user.
+    """
 
     def _get_match_hash_list(self, roles=None):
         temp_hashes = super(
