@@ -88,14 +88,14 @@ from tempest.api.compute.servers import test_server_actions
 from cinnamon_role import test
 
 
-@test.for_each_role_set(__name__)
+@test.for_each_role_set
 class ServerActionsTestJSON(test_server_actions.ServerActionsTestJSON):
     @classmethod
     def get_tenant_network(cls, credentials_type='primary'):
         return super(ServerActionsTestJSON, cls).get_tenant_network(
             credentials_type=cls.credentials[0][0])
 ```
-The decorator ```@test.for_each_role_set(__name__)``` is where the magic happens. Cinnamon Role automatically uses this test case to dynamically create test cases for each role set defined in the role sets file. The original test is not run, because the original test is not aware of the role-specified credentials available to it (it has no association with a specific role set).
+The decorator ```@test.for_each_role_set``` is where the magic happens. Cinnamon Role automatically uses this test case to dynamically create test cases for each role set defined in the role sets file. The original test is not run, because the original test is not aware of the role-specified credentials available to it (it has no association with a specific role set).
 
 In most cases, the subclass will just inherit from the Tempest test class with only a ```pass``` body. But, sometimes Tempest performs unwanted operations, so overriding functions is sometimes necessary.
 

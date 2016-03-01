@@ -3,7 +3,7 @@ from tempest.api.compute.servers import test_server_actions
 from cinnamon_role import test
 
 
-@test.for_each_role_set(__name__)
+@test.for_each_role_set
 class ServerActionsTestJSON(test_server_actions.ServerActionsTestJSON):
     @classmethod
     def get_tenant_network(cls, credentials_type='primary'):

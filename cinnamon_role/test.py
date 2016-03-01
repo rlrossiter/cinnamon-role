@@ -15,7 +15,12 @@ CONF = config.CONF
 RSP = role_set.RoleSetProvider(CONF.cinnamon.role_sets_file)
 
 
-class for_each_role_set(object):
+def for_each_role_set(cls):
+    gen = TestGenerator(cls.__module__)
+    return gen.fan_out(cls)
+
+
+class TestGenerator(object):
     """Fans out the test case for all role sets.
 
     This class takes all user types (role sets) that are defined in the
@@ -27,10 +32,10 @@ class for_each_role_set(object):
     test class (because those tests are not intended to be run in this
     setting.
     """
-    def __init__(self, module):
-        self.mod = module
+    def __init__(self, mod):
+        self.mod = mod
 
-    def __call__(self, cls):
+    def fan_out(self, cls):
         name = cls.__name__
         role_sets = get_role_sets()
         test_cases = []
