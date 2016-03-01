@@ -25,7 +25,7 @@ class ExactRoleMatchingPreProvisionedCredentialProvider(
             for role in unwanted_roles:
                 unwanted_users = self.hash_dict['roles'].get(role)
                 users_to_remove = set(temp_hashes) & set(unwanted_users)
-                temp_hashes = set(temp_hashes) - set(users_to_remove)
+                temp_hashes = list(set(temp_hashes) - set(users_to_remove))
 
             if not temp_hashes:
                 raise lib_exc.InvalidCredentials(
