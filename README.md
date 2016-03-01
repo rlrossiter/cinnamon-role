@@ -75,7 +75,7 @@ Here are the steps needed to setup your Cinnamon Role environment and run Cinnam
 8. Do any additional Tempest setup (user/project/network creation)
 9. Run Cinnamon Role
    - ```./run_tempest.sh -V cinnamon_role```
-10. Bob's your uncle!
+10. And Bob's your uncle!
 
 ## Implementing Tests
 In order for Cinnamon Role to run tests, tests need to become a part of Cinnamon Role. Because Tempest already holds a large number of tests, the preferred method of testing will be done by borrowing a Tempest test and running it against each user type. Sometimes there is not a Tempest test to fit the needs, so Cinnamon Role also allows for new tests to be written that borrow from Tempest's rest clients.
