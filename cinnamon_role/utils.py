@@ -23,6 +23,10 @@ def wrap_unauthorized(f):
             f(*args, **kwargs)
         except lib_exc.Forbidden:
             pass
+        else:
+            raise AssertionError("The test was expected to be forbidden from "
+                                 "performing an action, but was "
+                                 "unrestricted.")
     return wrapper
 
 
