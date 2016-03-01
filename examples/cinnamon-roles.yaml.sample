@@ -1,0 +1,7 @@
+admin:
+  - SoftLayerAdmin
+vmadmin:
+  - VMAdmin
+  - VMOperator
+user:
+  - VMOperator

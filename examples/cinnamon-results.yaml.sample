@@ -1,0 +1,6 @@
+cinnamon_role.tests.api.test_server_actions.ServerActionsTestJSON.test_lock_unlock_server:
+  pass:
+    - admin
+  fail:
+    - vmadmin
+    - user

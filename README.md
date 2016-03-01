@@ -69,9 +69,9 @@ Here are the steps needed to setup your Cinnamon Role environment and run Cinnam
 5. Install Cinnamon Role within Tempest's virtual environment
    - ```pip install cinnamon-role/```
 6. Set up role sets file
-   - See [role sets file example](examples/cinnamon-roles.yaml)
+   - See [role sets file example](examples/cinnamon-roles.yaml.sample)
 7. Set up expected results file
-   - See [expected results file example](examples/cinnamon-results.yaml)
+   - See [expected results file example](examples/cinnamon-results.yaml.sample)
 8. Do any additional Tempest setup (user/project/network creation)
 9. Run Cinnamon Role
    - ```./run_tempest.sh -V cinnamon_role```
@@ -98,6 +98,8 @@ class ServerActionsTestJSON(test_server_actions.ServerActionsTestJSON):
 The decorator ```@test.for_each_role_set(__name__)``` is where the magic happens. Cinnamon Role automatically uses this test case to dynamically create test cases for each role set defined in the role sets file. The original test is not run, because the original test is not aware of the role-specified credentials available to it (it has no association with a specific role set).
 
 In most cases, the subclass will just inherit from the Tempest test class with only a ```pass``` body. But, sometimes Tempest performs unwanted operations, so overriding functions is sometimes necessary.
+
+This same example can be found in [this example](examples/test_server_actions.py)
 
 ### Writing your own tests
 TODO(rlrossit)
