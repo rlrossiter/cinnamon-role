@@ -1,5 +1,5 @@
 import mock
-from tempest_lib import exceptions as lib_exc
+from tempest.lib import exceptions as lib_exc
 
 from cinnamon_role import preprov_creds as ppc
 from cinnamon_role.unit import base

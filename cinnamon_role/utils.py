@@ -2,7 +2,7 @@ import functools
 import inspect
 
 from tempest import config
-from tempest_lib import exceptions as lib_exc
+from tempest.lib import exceptions as lib_exc
 
 from cinnamon_role import expected_results
 

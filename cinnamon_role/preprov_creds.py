@@ -1,5 +1,5 @@
 from tempest.common import preprov_creds
-from tempest_lib import exceptions as lib_exc
+from tempest.lib import exceptions as lib_exc
 
 
 class ExactRoleMatchingPreProvisionedCredentialProvider(
