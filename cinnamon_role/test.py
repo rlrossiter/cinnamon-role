@@ -6,10 +6,7 @@ from cinnamon_role import credentials_factory
 from cinnamon_role import role_set
 from cinnamon_role import utils
 
-if sys.version_info >= (2, 7):
-    import unittest
-else:
-    import unittest2 as unittest
+import unittest2 as unittest
 
 CONF = config.CONF
 RSP = role_set.RoleSetProvider(CONF.cinnamon.role_sets_file)
@@ -58,8 +55,10 @@ class TestGenerator(object):
         def load_tests(loader, standard_tests, pattern):
             suite = unittest.TestSuite()
             for test_class in test_cases:
+                subsuite = unittest.TestSuite()
                 tests = loader.loadTestsFromTestCase(test_class)
-                suite.addTests(tests)
+                subsuite.addTests(tests)
+                suite.addTests(subsuite)
 
             return suite
 
