@@ -8,4 +8,4 @@ class ServerActionsTestJSON(test_server_actions.ServerActionsTestJSON):
     @classmethod
     def get_tenant_network(cls, credentials_type='primary'):
         return super(ServerActionsTestJSON, cls).get_tenant_network(
-            credentials_type=cls.credentials[0][0])
+            credentials_type=cls.credentials[0])
