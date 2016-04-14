@@ -65,12 +65,16 @@ class TestUtils(base.BaseTestCase):
     def test_wrap_for_role_set_unauthorized(self):
         self._do_wrap_test(unauthorized=True)
 
+    def test_wrap_for_role_set_unlisted(self):
+        self._do_wrap_test(unlisted=True)
+
     @mock.patch('cinnamon_role.utils.CONF')
     @mock.patch.object(expected_results, 'ExpectedResultsProvider')
     @mock.patch.object(utils, 'wrap_success')
     @mock.patch.object(utils, 'wrap_unauthorized')
-    def _do_wrap_test(self, mock_unauth, mock_succ, mock_erp,
-                      mock_conf, unauthorized=False):
+    @mock.patch.object(utils, 'wrap_skip')
+    def _do_wrap_test(self, mock_skip, mock_unauth, mock_succ, mock_erp,
+                      mock_conf, unauthorized=False, unlisted=False):
         mock_conf.cinnamon.expected_results_file = 'foo.yaml'
         mock_provider = mock.Mock()
         mock_get = mock.Mock()
@@ -78,9 +82,11 @@ class TestUtils(base.BaseTestCase):
         mock_provider.get_result = mock_get
         mock_erp.return_value = mock_provider
         mock_result.is_expected_fail.return_value = unauthorized
+        mock_result.is_unlisted.return_value = unlisted
         mock_get.return_value = mock_result
         mock_unauth.return_value = 'unauth'
         mock_succ.return_value = 'success'
+        mock_skip.return_value = 'unlist'
 
         my_func = mock.Mock()
         full_name = 'path.to.my.test'
@@ -88,12 +94,19 @@ class TestUtils(base.BaseTestCase):
 
         wrapped = utils.wrap_for_role_set(my_func, full_name, rs)
 
-        expected_return = 'unauth' if unauthorized else 'success'
+        if unauthorized:
+            expected_return = 'unauth'
+        elif unlisted:
+            expected_return = 'unlist'
+        else:
+            expected_return = 'success'
         self.assertEqual(expected_return, wrapped, "Wrapped the function "
                          "incorrectly")
         mock_erp.assert_called_once_with('foo.yaml')
         mock_get.assert_called_once_with(full_name, rs.name)
         if unauthorized:
             mock_unauth.assert_called_once_with(my_func)
+        elif unlisted:
+            mock_skip.assert_called_once_with(my_func)
         else:
             mock_succ.assert_called_once_with(my_func)

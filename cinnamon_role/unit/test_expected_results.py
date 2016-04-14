@@ -46,35 +46,50 @@ class TestExpectedResultsProvider(base.BaseTestCase):
     @mock.patch.object(expected_results, 'read_expected_results_yaml')
     def test_get_result_no_test_listed(self, mock_read):
         # No tests means there is no tests that came back from expected
-        # results. Because it isn't found, it is defaulted to pass
+        # results. Because it isn't found, it is unlisted
         results = {}
         mock_read.return_value = results
 
         erp = expected_results.ExpectedResultsProvider('foo.yaml')
         success_result = erp.get_result('test.foo.test_foobar', 'user1')
 
-        self.assertTrue(success_result.is_expected_pass())
+        self.assertTrue(success_result.is_unlisted())
 
     @mock.patch.object(expected_results, 'read_expected_results_yaml')
     def test_get_result_no_user_listed(self, mock_read):
         # Test an unlisted user. If the user is not present, it is an
-        # assumed pass
+        # unlisted test
         results = {'test.foo.test_foobar': {'pass': ['user1']}}
         mock_read.return_value = results
 
         erp = expected_results.ExpectedResultsProvider('foo.yaml')
         success_result = erp.get_result('test.foo.test_foobar', 'not_user')
 
-        self.assertTrue(success_result.is_expected_pass())
+        self.assertTrue(success_result.is_unlisted())
 
 
 class TestExpectedResults(base.BaseTestCase):
+    def setUp(self):
+        super(TestExpectedResults, self).setUp()
+        self.rs = expected_results.ResultState
+
     def test_expected_fail(self):
-        er = expected_results.ExpectedResult(False)
-        self.assertTrue(er.is_expected_fail())
+        state = self.rs(self.rs.FAIL)
+        er = expected_results.ExpectedResult(state)
         self.assertFalse(er.is_expected_pass())
+        self.assertTrue(er.is_expected_fail())
+        self.assertFalse(er.is_unlisted())
 
     def test_expected_pass(self):
-        er = expected_results.ExpectedResult(True)
+        state = self.rs(self.rs.PASS)
+        er = expected_results.ExpectedResult(state)
         self.assertTrue(er.is_expected_pass())
         self.assertFalse(er.is_expected_fail())
+        self.assertFalse(er.is_unlisted())
+
+    def test_unlisted(self):
+        state = self.rs(self.rs.UNLISTED)
+        er = expected_results.ExpectedResult(state)
+        self.assertFalse(er.is_expected_pass())
+        self.assertFalse(er.is_expected_fail())
+        self.assertTrue(er.is_unlisted())

@@ -1,5 +1,6 @@
 import functools
 import inspect
+import testtools
 
 from tempest import config
 from tempest.lib import exceptions as lib_exc
@@ -30,6 +31,16 @@ def wrap_unauthorized(f):
     return wrapper
 
 
+def wrap_skip(f):
+    """Wrap a function to skip the test."""
+    @functools.wraps(f)
+    def skip_test(*args, **kwargs):
+        raise testtools.TestCase.skipException("The test is unlisted in the "
+                                               "expected results file, so the "
+                                               "test is skipped.")
+    return skip_test
+
+
 def find_tests(cls):
     """Find all tests on the given class."""
     all_functions = inspect.getmembers(
@@ -54,5 +65,7 @@ def wrap_for_role_set(f, full_name, role_set):
     # Make the default assumption to pass
     if er.is_expected_fail():
         return wrap_unauthorized(f)
+    elif er.is_unlisted():
+        return wrap_skip(f)
     else:
         return wrap_success(f)
