@@ -1,5 +1,6 @@
 import sys
 
+from oslo_log import log as logging
 from tempest import config
 
 from cinnamon_role import credentials_factory
@@ -10,10 +11,13 @@ import unittest2 as unittest
 
 CONF = config.CONF
 RSP = role_set.RoleSetProvider(CONF.cinnamon.role_sets_file)
+LOG = logging.getLogger(__name__)
 
 
-def for_each_role_set(cls):
-    gen = TestGenerator(cls.__module__)
+def for_each_role_set(cls, test_module=None):
+    module = cls.__module__
+    test_module = test_module or cls.__module__
+    gen = TestGenerator(module, test_module=test_module)
     return gen.fan_out(cls)
 
 
@@ -29,8 +33,10 @@ class TestGenerator(object):
     test class (because those tests are not intended to be run in this
     setting.
     """
-    def __init__(self, mod):
+    def __init__(self, mod, test_module=None):
         self.mod = mod
+        # The test_module is what we will be assigning load_tests on
+        self.test_module = test_module or mod
 
     def fan_out(self, cls):
         name = cls.__name__
@@ -41,20 +47,22 @@ class TestGenerator(object):
         # module
         for rs in role_sets:
             new_name, new_cls = self._generate_class(name, (cls, ), rs)
-            setattr(sys.modules[self.mod], new_name, new_cls)
+            setattr(sys.modules[self.test_module], new_name, new_cls)
             test_cases.append(new_cls)
+
+        mod_cases = getattr(sys.modules[self.test_module],
+                            '_cr_test_cases', [])
+        mod_cases += test_cases
+        setattr(sys.modules[self.test_module], '_cr_test_cases', mod_cases)
 
         # this is the custom load_tests function that will be set on the
         # module so when tests are loaded, it gets only the tests generated
         # by this decorator
-        # TODO(rlrossit): Right now this will overwrite any existing
-        # load_tests() function that is already on the module.
-        # because of this, only one test class can be defined per module.
-        # This should be changed over to "inherit" from the existing
-        # load_tests so it groups all together and returns all tests
         def load_tests(loader, standard_tests, pattern):
+            LOG.info("Calling load tests")
             suite = unittest.TestSuite()
-            for test_class in test_cases:
+            LOG.info("Test cases: %s" % mod_cases)
+            for test_class in mod_cases:
                 subsuite = unittest.TestSuite()
                 tests = loader.loadTestsFromTestCase(test_class)
                 subsuite.addTests(tests)
@@ -62,7 +70,7 @@ class TestGenerator(object):
 
             return suite
 
-        setattr(sys.modules[self.mod], 'load_tests',
+        setattr(sys.modules[self.test_module], 'load_tests',
                 load_tests)
 
         # We give back the original class because we don't want to do anything
