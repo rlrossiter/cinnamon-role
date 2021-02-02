@@ -62,7 +62,7 @@ Here are the steps needed to setup your Cinnamon Role environment and run Cinnam
 1. Clone Tempest
    - ```git clone http://github.com/openstack/tempest```
 2. Clone Cinnamon Role
-   - ```git clone https://github.rtp.raleigh.ibm.com/rlrossit-us/cinnamon-role.git```
+   - ```git clone https://github.com/rlrossiter/cinnamon-role.git```
 3. Add ```[cinnamon]``` section to tempest.conf
 4. Install the Tempest virtual environment
    - ```python tools/install_venv.py```
